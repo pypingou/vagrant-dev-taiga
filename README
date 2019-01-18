@@ -1,0 +1,55 @@
+This repository contains the instruction needed to set up a development instance
+of taiga in a vagrant box on Fedora 29.
+
+
+Customize vagrant
+-----------------
+
+To configure vagrant not to ask for your password at every command, create
+``/etc/polkit-1/localauthority/50-local.d/libvirt.pkla`` on your host with the
+following contents, substituting ``yourname`` with your own username::
+
+   [Allow yourname libvirt management permissions]
+   Identity=unix-user:yourname
+   Action=org.libvirt.unix.manage
+   ResultAny=yes
+   ResultInactive=yes
+   ResultActive=yes
+
+
+Get it running
+--------------
+
+* build the vagrant image::
+
+    vagrant up
+
+* go into it::
+
+    vagrant ssh
+
+* Get into the taiga-back clone::
+
+    cd taiga-back
+
+* Create the virtualenv (only needed the first time)::
+
+    pipenv sync --dev
+
+* Start the virtualenv::
+
+    pipenv shell
+
+* Populate the database with some data (only needed the first time)::
+
+    python manage.py migrate --noinput
+    python manage.py loaddata initial_user
+    python manage.py loaddata initial_project_templates
+    python manage.py compilemessages
+    python manage.py collectstatic --noinput
+
+* Run the server::
+
+    python manage.py runserver
+
+
