@@ -1,0 +1,43 @@
+---                                 
+- name: Install packages
+  package:
+    state: present
+    name:
+      - bash-completion
+      - gcc
+      - vim
+      - python36
+      - libxml2-devel
+      - libxslt-devel
+      - libjpeg-devel
+      - libffi-devel
+      - git
+      - nodejs
+      - npm
+      - pipenv
+
+- name: Clone the sources for the backend
+  git:
+      repo: 'https://github.com/taigaio/taiga-back.git'
+      dest: '/home/vagrant/taiga-back'
+
+- name: Create a new virtualenv and install dependencies
+  shell: pipenv sync --dev
+  args:
+      chdir: /home/vagrant/taiga-back
+
+- name: Install the local config file
+  copy:
+      src: local.py
+      dest: /home/vagrant/taiga-back/settings/local.py
+      mode: 0644
+
+- name: Clone the sources for the frontend
+  git:
+      repo: 'https://github.com/taigaio/taiga-front.git'
+      dest: '/home/vagrant/taiga-front'
+
+- name: Fix file ownership
+  shell: chown vagrant:vagrant -R /home/vagrant/*
+
+
